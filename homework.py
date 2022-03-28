@@ -146,10 +146,11 @@ def read_package(workout_type: str, data: list) -> Training:
                                                       RUN: Running,
                                                       SWALK: SportsWalking}
     try:
-        return workout[workout_type](*data)
+        training = workout[workout_type](*data) 
     except KeyError:
         print(f'You entered workout_type {workout_type}, '
               f'but waiting {workout.keys()}')
+    return training
 
 
 def main(training: Training) -> None:
@@ -160,7 +161,7 @@ def main(training: Training) -> None:
 
 if __name__ == '__main__':
     packages = [
-        ('SWMm', [720, 1, 80, 25, 40]),
+        ('SWM', [720, 1, 80, 25, 40]),
         ('RUN', [15000, 1, 75]),
         ('WLK', [9000, 1, 75, 180]),
     ]
