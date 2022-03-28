@@ -1,5 +1,5 @@
-from dataclasses import dataclass, asdict
-from typing import Dict, Type, ClassVar
+from dataclasses import asdict, dataclass
+from typing import ClassVar, Dict, Type
 
 
 @dataclass
@@ -29,6 +29,8 @@ class Training:
     LEN_STEP: float = 0.65
     # константа для перевода значений из метров в километры
     M_IN_KM: float = 1000
+    # константа время в одном часе - 60 минут
+    TIME_RATIO: float = 60
 
     def __init__(self,
                  action: int,
@@ -52,7 +54,8 @@ class Training:
         Для каждого вида тренировок подсчет калорий свой в своих методах
         поэтому здесь заглушка."""
         raise NotImplementedError(
-            'Для каждого вида тренировок свой метод подсчета калорий.')
+            f'В классе {type(self).__name__} не определён метод'
+            f' get_spent_calories')
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -72,7 +75,7 @@ class Running(Training):
         """Получить количество затраченных калорий для тренировки бег."""
         return ((self.CALORIE_RATIO_1 * self.get_mean_speed()
                 - self.CALORIE_RATIO_2) * self.weight
-                / self.M_IN_KM * (self.duration * 60))
+                / self.M_IN_KM * (self.duration * self.TIME_RATIO))
 
 
 class SportsWalking(Training):
@@ -83,8 +86,6 @@ class SportsWalking(Training):
     WALK_RATIO_2: float = 0.029
     # степень для расчета квадрата скорости
     WALK_RATIO_3: float = 2
-    # время в одном часе - 60 минут
-    WALK_RATIO_4: float = 60
 
     def __init__(self,
                  action: int,
@@ -99,7 +100,7 @@ class SportsWalking(Training):
         """Количество затраченных калорий при спортивной ходьбе."""
         return ((self.WALK_RATIO_1 * self.weight
                 + (self.get_mean_speed() ** self.WALK_RATIO_3 // self.height)
-                * self.WALK_RATIO_2) * (self.duration * self.WALK_RATIO_4))
+                * self.WALK_RATIO_2) * (self.duration * self.TIME_RATIO))
 
 
 class Swimming(Training):
@@ -145,7 +146,7 @@ def read_package(workout_type: str, data: list) -> Training:
         training = workout[workout_type](*data)
     except KeyError:
         raise ValueError("You entered invalid workout_type " + workout_type
-                         + " but waiting " + str(workout.keys()))
+                         + " but waiting one of " + ' or '.join(list(workout)))
     return training
 
 
