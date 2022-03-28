@@ -1,5 +1,5 @@
 from dataclasses import dataclass, asdict
-from typing import Dict, Union, Type, ClassVar
+from typing import Dict, Type, ClassVar
 
 
 @dataclass
@@ -140,11 +140,9 @@ def read_package(workout_type: str, data: list) -> Training:
     SWIM: str = 'SWM'
     RUN: str = 'RUN'
     SWALK: str = 'WLK'
-    workout: Dict[str, Union[Type[Swimming],
-                             Type[Running],
-                             Type[SportsWalking]]] = {SWIM: Swimming,
-                                                      RUN: Running,
-                                                      SWALK: SportsWalking}
+    workout: Dict[str, Type[Training]] = {SWIM: Swimming,
+                                          RUN: Running,
+                                          SWALK: SportsWalking}
     try:
         training = workout[workout_type](*data)
     except KeyError:
