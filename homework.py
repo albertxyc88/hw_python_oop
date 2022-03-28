@@ -81,6 +81,10 @@ class SportsWalking(Training):
     # Коэффициенты для расчета калорий при SportWalking
     WALK_RATIO_1: float = 0.035
     WALK_RATIO_2: float = 0.029
+    # степень для расчета квадрата скорости
+    WALK_RATIO_3: float = 2
+    # время в одном часе - 60 минут
+    WALK_RATIO_4: float = 60
 
     def __init__(self,
                  action: int,
@@ -94,8 +98,8 @@ class SportsWalking(Training):
     def get_spent_calories(self) -> float:
         """Количество затраченных калорий при спортивной ходьбе."""
         return ((self.WALK_RATIO_1 * self.weight
-                + (self.get_mean_speed() ** 2 // self.height)
-                * self.WALK_RATIO_2) * (self.duration * 60))
+                + (self.get_mean_speed() ** self.WALK_RATIO_3 // self.height)
+                * self.WALK_RATIO_2) * (self.duration * self.WALK_RATIO_4))
 
 
 class Swimming(Training):
@@ -103,8 +107,6 @@ class Swimming(Training):
 
     # расстояние, которое спорстмен преодолевает за один гребок.
     LEN_STEP: float = 1.38
-    # константа для перевода значений из метров в километры
-    M_IN_KM: float = 1000
     # Коэффициенты для расчета калорий при Swimming
     SWIM_RATIO_1: float = 1.1
     SWIM_RATIO_2: float = 2
@@ -119,10 +121,6 @@ class Swimming(Training):
         super().__init__(action, duration, weight)
         self.length_pool = length_pool
         self.count_pool = count_pool
-
-    def get_distance(self) -> float:
-        """Получить дистанцию в км."""
-        return self.action * self.LEN_STEP / self.M_IN_KM
 
     def get_mean_speed(self) -> float:
         """Получить среднюю скорость движения при плавании."""
@@ -146,8 +144,8 @@ def read_package(workout_type: str, data: list) -> Training:
     try:
         training = workout[workout_type](*data)
     except KeyError:
-        print(f'You entered workout_type {workout_type}, '
-              f'but waiting {workout.keys()}')
+        raise ValueError("You entered invalid workout_type " + workout_type
+                         + " but waiting " + str(workout.keys()))
     return training
 
 
